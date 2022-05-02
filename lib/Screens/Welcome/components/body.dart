@@ -18,18 +18,20 @@ class Body extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              "WELCOME TO EDU",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: size.height * 0.03,),
+            /* 
+             */
+            // SizedBox(height: size.height * 0.03,),
             SvgPicture.asset(
-              "assets/icons/chat.svg",
-              height: size.height * 0.45,
+              "assets/icons/Illustration-welcome.svg",
+              height: size.height * 0.30,
             ),
             SizedBox(height: size.height * 0.05,),
+            Text("Welcome", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins'),),
+            SizedBox(height: size.height * 0.02,),
+            Text("The attendance application for employees enable accurate time tracking", textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),),
+            SizedBox(height: size.height * 0.02,),
             RoundedButton(
-              text: "LOGIN",
+              text: "Login",
               press: () {
                 Navigator.push(context, MaterialPageRoute(builder:  (_) {
                   return const LoginScreen();
@@ -37,9 +39,8 @@ class Body extends StatelessWidget {
               },
             ),
             RoundedButton(
-              text: "SING UP",
-              color: kPrimaryLightColor,
-              textColor: Colors.black,
+              text: "Sign Up",
+              textColor: Colors.white,
               press: (){
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SignUpScreen()));
               },

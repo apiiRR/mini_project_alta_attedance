@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mini_project_alta_attedance/Screens/Singup/signup_view_model.dart';
 import 'package:mini_project_alta_attedance/models/account.dart';
+import 'package:mini_project_alta_attedance/provider/authservice.dart';
 import 'package:provider/provider.dart';
 import '/Screens/Login/login_screen.dart';
 import '/components/already_have_account.dart';
@@ -28,38 +29,45 @@ class Body extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            /* const Text(
               "SIGN UP",
               style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            ), */
             SizedBox(
               height: size.height * 0.03,
             ),
             SvgPicture.asset(
-              "assets/icons/signup.svg",
-              height: size.height * 0.35,
+              "assets/icons/Illustration-welcome.svg",
+              height: size.height * 0.30,
+            ),
+            SizedBox(
+              height: size.height * 0.03,
+            ),
+            Text("Sign Up", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, fontFamily: 'Poppins'),),
+            SizedBox(
+              height: size.height * 0.03,
             ),
             FormBuilder(
                 key: _formKey,
                 child: Column(children: [
                   const RoundedInputField(
-                    hintText: "Your Name",
+                    hintText: "Name",
                     name: 'username',
                     icon: Icons.person,
                   ),
                   const RoundedInputField(
-                    hintText: "Your Email",
+                    hintText: "Email",
                     name: 'email',
                     icon: Icons.email_rounded,
                   ),
                   const RoundedPasswordField(),
-                  Consumer<SignupViewModel>(
+                  Consumer<AuthService>(
                       builder: (context, value, child) => RoundedButton(
-                          text: "SIGNUP",
+                          text: "Sign Up",
                           press: () {
                             _formKey.currentState!.save();
                             value
-                                .signUp(Account(
+                                .createUser(Account(
                                     id: 0.toString(),
                                     name: _formKey
                                         .currentState!.value["username"],
@@ -67,7 +75,7 @@ class Body extends StatelessWidget {
                                         _formKey.currentState!.value["email"],
                                     password: _formKey
                                         .currentState!.value["password"],
-                                    createdAt: datetimeNow))
+                                    createdAt: datetimeNow, phone: '0', job: 'none'))
                                 .then((value) {
                               if (value == true) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +85,7 @@ class Body extends StatelessWidget {
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                                Navigator.pop(context);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -90,13 +98,14 @@ class Body extends StatelessWidget {
                           })),
                 ])),
             SizedBox(
-              height: size.height * 0.03,
+              height: size.height * 0.02,
             ),
             AlreadyHaveAccount(
               login: false,
               press: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                /* Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => const LoginScreen())); */
+                    Navigator.pop(context);
               },
             ),
             /* OrDivider(),

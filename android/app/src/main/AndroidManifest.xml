@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mini_project_alta_attedance">
-   <application
-        android:label="mini_project_alta_attedance"
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application
+        android:label="Micella Sayang Rafi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

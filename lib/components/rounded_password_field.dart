@@ -4,26 +4,38 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../constants.dart';
 import 'text_field_container.dart';
 
-class RoundedPasswordField extends StatelessWidget {
+class RoundedPasswordField extends StatefulWidget {
   const RoundedPasswordField({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<RoundedPasswordField> createState() => _RoundedPasswordFieldState();
+}
+
+class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
+  bool showPassword = true;
+  @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
         child: FormBuilderTextField(
       name: 'password',
-      obscureText: true,
-      decoration: const InputDecoration(
+      obscureText: showPassword,
+      decoration: InputDecoration(
           hintText: "Password",
-          icon: Icon(
+          hintStyle: const TextStyle(fontSize: 16),
+          icon: const Icon(
             Icons.lock,
-            color: kPrimaryColor,
+            color: kPrimaryMaroon,
           ),
-          suffixIcon: Icon(
-            Icons.visibility,
-            color: kPrimaryColor,
+          suffixIcon: IconButton(
+            onPressed: () {
+              setState(() {
+                showPassword = !showPassword;
+              });
+            },
+            icon: const Icon(Icons.visibility),
+            color: kPrimaryMaroon,
           ),
           border: InputBorder.none),
     ));
