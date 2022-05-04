@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_project_alta_attedance/Screens/Homepage/homepage.dart';
 import 'package:mini_project_alta_attedance/Screens/Profile/profile.dart';
+import 'package:mini_project_alta_attedance/Screens/Report/report.dart';
 
 import '../constants.dart';
 
@@ -26,7 +27,7 @@ class Navbar extends StatelessWidget {
               children: [
                 MaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
                   },
                   minWidth: 40,
                   child: Column(
@@ -47,7 +48,7 @@ class Navbar extends StatelessWidget {
                 ),
                 MaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ReportScreen()));
                   },
                   minWidth: 40,
                   child: Column(

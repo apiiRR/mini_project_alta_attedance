@@ -10,8 +10,13 @@ class AccountAPI {
   }
 
   static Future getAccount() async {
+    var hasilResponse;
     var response = await Dio().get("https://mini-project-flutter-aee89-default-rtdb.firebaseio.com/account.json");
-    var hasilResponse = response.data as Map;
+    if (response.data != null) {
+      hasilResponse = response.data as Map;
+    } else {
+      var hasilResponse = null;
+    }
     return hasilResponse;
     // print(hasilResponse);
   }

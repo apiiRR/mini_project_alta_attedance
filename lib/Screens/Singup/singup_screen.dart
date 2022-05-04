@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 import 'components/body.dart';
 
@@ -7,8 +8,10 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Body(),
+    return LoaderOverlay(
+      child: const Scaffold(
+        body: Body(),
+      ),
     );
   }
 }

@@ -5,11 +5,9 @@ import '../models/account.dart';
 import '../models/api/account_api.dart';
 
 class AuthService with ChangeNotifier {
-
   AuthService() {
     syncDataWithProvider();
   }
-
 
   List<String> currentUser = [];
   List<String> dataEmail = [];
@@ -75,9 +73,11 @@ class AuthService with ChangeNotifier {
 
   Future getAllEmail() async {
     final data = await AccountAPI.getAccount();
-    data.forEach((key, value) {
-      dataEmail.add(value["email"].toString());
-    });
+    if (data != null) {
+      data.forEach((key, value) {
+        dataEmail.add(value["email"].toString());
+      });
+    }
     notifyListeners();
   }
 
@@ -89,10 +89,15 @@ class AuthService with ChangeNotifier {
     notifyListeners();
   }
 
-    void add(List item) {
+  void add(List item) {
     currentUser = [...item];
     // contacts.add(contact);
     updateSharedPreferences();
     notifyListeners();
+  }
+
+  void refresh() {
+    currentUser.clear();
+    updateSharedPreferences();
   }
 }

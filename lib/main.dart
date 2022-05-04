@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_project_alta_attedance/Screens/Homepage/homepage.dart';
+import 'package:mini_project_alta_attedance/Screens/Profile/profile_view_model.dart';
 import 'package:mini_project_alta_attedance/provider/authservice.dart';
 import 'package:provider/provider.dart';
 import '/Screens/Welcome/welcome_screen.dart';
@@ -8,7 +9,8 @@ void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (context) => AuthService(),
-    )
+    ),
+    ChangeNotifierProvider(create: (context) => ProfileViewModel()),
   ], child: const MyApp()));
 }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mini_project_alta_attedance/Screens/Singup/signup_view_model.dart';
 import 'package:mini_project_alta_attedance/models/account.dart';
 import 'package:mini_project_alta_attedance/provider/authservice.dart';
@@ -65,6 +66,7 @@ class Body extends StatelessWidget {
                       builder: (context, value, child) => RoundedButton(
                           text: "Sign Up",
                           press: () {
+                            context.loaderOverlay.show();
                             _formKey.currentState!.save();
                             value
                                 .createUser(Account(
@@ -75,9 +77,10 @@ class Body extends StatelessWidget {
                                         _formKey.currentState!.value["email"],
                                     password: _formKey
                                         .currentState!.value["password"],
-                                    createdAt: datetimeNow, phone: '0', job: 'none'))
+                                    createdAt: datetimeNow, nip: '0', job: 'none'))
                                 .then((value) {
                               if (value == true) {
+                                context.loaderOverlay.hide();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
@@ -87,6 +90,7 @@ class Body extends StatelessWidget {
                                 );
                                 Navigator.pop(context);
                               } else {
+                                context.loaderOverlay.hide();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text("Email sudah pernah didaftarkan."),

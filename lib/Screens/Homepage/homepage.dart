@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mini_project_alta_attedance/components/navbar.dart';
+import 'package:mini_project_alta_attedance/components/top_background.dart';
 import 'package:mini_project_alta_attedance/constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -17,15 +17,7 @@ class HomePage extends StatelessWidget {
         width: double.infinity,
         height: size.height,
         child: Stack(alignment: Alignment.center, children: [
-          Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: size.height * 0.5,
-              child: Image.asset(
-                "assets/images/Illustration-background_1.png",
-                fit: BoxFit.fill,
-              )),
+          TopBackground(size: size),
           SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
             child: Column(
