@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mini_project_alta_attedance/Screens/Attedance/attedance.dart';
-import 'package:mini_project_alta_attedance/Screens/Homepage/homepage.dart';
-import 'package:mini_project_alta_attedance/Screens/Profile/profile.dart';
-import 'package:mini_project_alta_attedance/Screens/Report/report.dart';
-import 'package:mini_project_alta_attedance/constants.dart';
+import 'package:provider/provider.dart';
+import 'navigation_view_model.dart';
+import 'report.dart';
+import '../../constants.dart';
+import 'homepage.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({Key? key}) : super(key: key);
@@ -13,52 +13,32 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> {
-  // Color background = Colors.black;
-  int _currentTab = 0;
-
-  List<IconData> icon = [
-    Icons.home,
-    Icons.qr_code_scanner,
-    Icons.library_books,
-    Icons.person
-  ];
-
-  final List<Widget> screen = [
+  int _currentIndex = 0;
+  List pages = const [
     HomePage(),
-    ProfileScreen(),
+    Report(),
   ];
-
-  Widget currentScreen = HomePage();
-
-  final PageStorageBucket bucket = PageStorageBucket();
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      /* appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        leading: Icon(
-          Icons.fingerprint,
-          color: kPrimaryColor,
-        ),
-        title: Text(
-          "Attedance Apps",
-          style: TextStyle(color: kPrimaryColor),
-        ),
-        titleSpacing: -5,
-        actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.logout,
-                color: kPrimaryColor,
-              )),
-        ],
-      ), */
-      // backgroundColor: kPrimaryColor,
-      body: currentScreen,
+      body: Container(
+          width: double.infinity,
+          height: size.height,
+          child: Stack(alignment: Alignment.center, children: [
+            Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: size.height * 0.5,
+                child: Image.asset(
+                  "assets/images/Illustration-background_1.png",
+                  fit: BoxFit.fill,
+                )),
+            pages[_currentIndex]
+          ])),
       floatingActionButton: FloatingActionButton(
-        child: Icon(
+        child: const Icon(
           Icons.fingerprint,
           color: kPrimaryMaroon,
           size: 45,
@@ -68,13 +48,13 @@ class _NavigationState extends State<Navigation> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           boxShadow: [
             BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
           ],
         ),
         child: BottomAppBar(
-          shape: CircularNotchedRectangle(),
+          shape: const CircularNotchedRectangle(),
           child: Container(
             height: 60,
             child: Row(
@@ -83,9 +63,10 @@ class _NavigationState extends State<Navigation> {
                 MaterialButton(
                   onPressed: () {
                     setState(() {
-                      currentScreen = HomePage();
-                      _currentTab = 0;
+                      _currentIndex = 0;
                     });
+                    // Navigator.pushReplacement(context,
+                    //     MaterialPageRoute(builder: (_) => const HomePage()));
                   },
                   minWidth: 40,
                   child: Column(
@@ -93,14 +74,14 @@ class _NavigationState extends State<Navigation> {
                     children: [
                       Icon(
                         Icons.home,
-                        color: _currentTab == 0 ? kPrimaryMaroon : kPrimarygrey, size: 36,
+                        color: _currentIndex == 0 ? kPrimaryMaroon :  kPrimarygrey,
+                        size: 36,
                       ),
                       Text(
                         'Home',
                         style: TextStyle(
-                          color:
-                              _currentTab == 0 ? kPrimaryMaroon : kPrimarygrey, fontFamily: 'Poppins'
-                        ),
+                            color: _currentIndex == 0 ? kPrimaryMaroon :  kPrimarygrey,
+                            fontFamily: 'Poppins'),
                       )
                     ],
                   ),
@@ -108,24 +89,27 @@ class _NavigationState extends State<Navigation> {
                 MaterialButton(
                   onPressed: () {
                     setState(() {
-                      currentScreen = ProfileScreen();
-                      _currentTab = 1;
+                      _currentIndex = 1;
                     });
+                    // Navigator.pushReplacement(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (_) => const ReportScreen()));
                   },
                   minWidth: 40,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.person,
-                        color: _currentTab == 1 ? kPrimaryMaroon : kPrimarygrey, size: 36,
+                        Icons.data_exploration,
+                        color: _currentIndex == 1 ? kPrimaryMaroon :  kPrimarygrey,
+                        size: 36,
                       ),
                       Text(
-                        'Profile',
+                        'Report',
                         style: TextStyle(
-                          color:
-                              _currentTab == 1 ? kPrimaryMaroon : kPrimarygrey, fontFamily: 'Poppins'
-                        ),
+                            color: _currentIndex == 1 ? kPrimaryMaroon :  kPrimarygrey,
+                            fontFamily: 'Poppins'),
                       )
                     ],
                   ),
@@ -135,59 +119,6 @@ class _NavigationState extends State<Navigation> {
           ),
         ),
       ),
-      /*   bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          indicatorColor: kPrimaryColor,
-          labelTextStyle: MaterialStateProperty.all(
-              const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-              iconTheme: MaterialStateProperty.all(IconThemeData(color: Colors.white)),
-        ),
-        child: Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-            boxShadow: [
-              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10.0),
-              topRight: Radius.circular(10.0),
-            ),
-            child: NavigationBar(
-              backgroundColor: kPrimaryLightColor,
-              animationDuration: const Duration(seconds: 1),
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              height: 60,
-              selectedIndex: _currentIndex,
-              onDestinationSelected: (int newIndex) {
-                setState(() {
-                  _currentIndex = newIndex;
-                });
-              },
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined, color: Colors.white,),
-                  label: 'Beranda',
-                  selectedIcon: Icon(Icons.home),
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.fingerprint_outlined,  color: Colors.white,),
-                  label: 'Presensi',
-                  selectedIcon: Icon(Icons.fingerprint),
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline,  color: Colors.white,),
-                  label: 'Profil',
-                  selectedIcon: Icon(Icons.person),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ), */
     );
   }
 }

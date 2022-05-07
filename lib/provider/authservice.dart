@@ -41,6 +41,7 @@ class AuthService with ChangeNotifier {
     var status = false;
     tempData.clear();
     await getAllAccount().then((value) {
+      // print(tempData);
       for (var item in tempData) {
         if (item.contains(email.toLowerCase()) && item.contains(password)) {
           add(item);
@@ -55,6 +56,7 @@ class AuthService with ChangeNotifier {
 
   Future updateSharedPreferences() async {
     List<String> myData = currentUser;
+    // print(myData);
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.setStringList('login', myData);
@@ -63,9 +65,20 @@ class AuthService with ChangeNotifier {
   Future syncDataWithProvider() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result = prefs.getStringList('login');
+    // print(result);
 
     if (result != null) {
-      currentUser = result;
+      tempData.clear();
+      await getAllAccount().then((value) {
+        // print(tempData);
+        for (var item in tempData) {
+          if (item.contains(result[2].toLowerCase()) &&
+              item.contains(result[3])) {
+            currentUser = result;
+            break;
+          }
+        }
+      });
     }
 
     notifyListeners();
@@ -84,7 +97,14 @@ class AuthService with ChangeNotifier {
   Future<void> getAllAccount() async {
     final data = await AccountAPI.getAccount();
     data.forEach((key, value) {
-      tempData.add([key, value["name"], value["email"], value["password"]]);
+      tempData.add([
+        key,
+        value["name"],
+        value["email"],
+        value["password"],
+        value["job"],
+        value["nip"],
+      ]);
     });
     notifyListeners();
   }
@@ -99,5 +119,7 @@ class AuthService with ChangeNotifier {
   void refresh() {
     currentUser.clear();
     updateSharedPreferences();
+
+    notifyListeners();
   }
 }

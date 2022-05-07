@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:mini_project_alta_attedance/Screens/Homepage/homepage.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/navigation.dart';
-import 'package:mini_project_alta_attedance/Screens/Login/login_view_model.dart';
 import 'package:mini_project_alta_attedance/provider/authservice.dart';
 import 'package:provider/provider.dart';
 import '/Screens/Singup/singup_screen.dart';
@@ -99,7 +97,7 @@ class Body extends StatelessWidget {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const HomePage()),
+                                      builder: (_) => const Navigation()),
                                   (Route) => false,
                                 );
                               }

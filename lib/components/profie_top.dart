@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mini_project_alta_attedance/Screens/Profile/profile.dart';
-
 import '../constants.dart';
 
 class ProfileTop extends StatelessWidget {
@@ -17,7 +16,7 @@ class ProfileTop extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfileScreen()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
               },
               child: Container(
                 width: 60,
@@ -32,16 +31,16 @@ class ProfileTop extends StatelessWidget {
                           spreadRadius: 2,
                           blurRadius: 10,
                           color: Colors.black.withOpacity(0.1),
-                          offset: Offset(0, 1)),
+                          offset: const Offset(0, 1)),
                     ],
                     shape: BoxShape.circle,
                     color: Colors.grey),
               ),
             ),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Text(
                   "Welcome",
                   style: TextStyle(
@@ -49,8 +48,7 @@ class ProfileTop extends StatelessWidget {
                       fontSize: 24,
                       fontFamily: 'Poppins'),
                 ),
-                Text(
-                  "Rafi Ramadhana",
+                Text("Username",
                   style: TextStyle(
                       fontSize: 20, fontFamily: 'Poppins'),
                 )
@@ -61,9 +59,9 @@ class ProfileTop extends StatelessWidget {
         Container(
           height: 40,
           width: 40,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               shape: BoxShape.circle, color: kPrimaryMaroon),
-          child: Icon(
+          child: const Icon(
             Icons.notifications,
             color: Colors.white,
           ),
