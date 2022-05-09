@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -7,12 +8,18 @@ import '../../constants.dart';
 import '../Profile/profile.dart';
 import 'navigation_view_model.dart';
 
-class Report extends StatelessWidget {
-  const Report({ Key? key }) : super(key: key);
+class Report extends StatefulWidget {
+  const Report({Key? key}) : super(key: key);
 
+  @override
+  State<Report> createState() => _ReportState();
+}
+
+class _ReportState extends State<Report> {
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<NavigationViewModel>(context);
+    final dataCheckIn = data.data;
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
@@ -28,8 +35,16 @@ class Report extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => ProfileScreen()));
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (_) => ProfileScreen()))
+                          .then((value) {
+                        setState(() {
+                          print('update state');
+                          data.syncDataWithProvider();
+                          print('after update');
+                        });
+                      });
                     },
                     child: Container(
                       width: 60,
@@ -60,7 +75,8 @@ class Report extends StatelessWidget {
                             fontSize: 24,
                             fontFamily: 'Poppins'),
                       ),
-                      Text(data.account.length > 0 ? data.account[1] : "Username",
+                      Text(
+                        data.account.length > 0 ? data.account[1] : "Username",
                         style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
                       )
                     ],
@@ -212,111 +228,149 @@ class Report extends StatelessWidget {
               ),
             ],
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: 5,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                margin: EdgeInsets.only(bottom: 10),
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                      offset: Offset(0, 2), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(5),
-                      width: 100,
-                      height: 60,
+          dataCheckIn.isEmpty
+              ? Container(
+                  margin: EdgeInsets.only(
+                      bottom: size.height * 0.3, top: size.height * 0.03),
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 2,
+                        offset: Offset(0, 2), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text("Data is Empty"),
+                  ))
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: dataCheckIn.length,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: kPrimaryPink,
                         borderRadius: BorderRadius.circular(8),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 2,
+                            offset: Offset(0, 2), // changes position of shadow
+                          ),
+                        ],
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(
-                            "19",
-                            style: TextStyle(
-                                color: kPrimaryMaroon,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 36),
-                          ),
-                          SizedBox(
-                            width: 6,
+                          Container(
+                            padding: EdgeInsets.all(5),
+                            width: 100,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: kPrimaryPink,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  DateFormat('dd')
+                                      .format(DateTime.parse(
+                                          dataCheckIn[index].checkIn))
+                                      .toString(),
+                                  style: TextStyle(
+                                      color: kPrimaryMaroon,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 36),
+                                ),
+                                SizedBox(
+                                  width: 6,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      DateFormat('E')
+                                          .format(DateTime.parse(
+                                              dataCheckIn[index].checkIn))
+                                          .toString(),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      DateFormat('MMMM')
+                                          .format(DateTime.parse(
+                                              dataCheckIn[index].checkIn))
+                                          .toString(),
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Fri",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                "Check In",
+                                style: TextStyle(),
+                              ),
+                              SizedBox(
+                                height: 8,
                               ),
                               Text(
-                                "May",
-                                style: TextStyle(fontSize: 16),
+                                DateFormat.Hms()
+                                    .format(DateTime.parse(
+                                        dataCheckIn[index].checkIn))
+                                    .toString(),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryMaroon),
+                              )
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Check Out",
+                                style: TextStyle(),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Text(
+                                dataCheckIn[index].checkOut != ""
+                                    ? DateFormat.Hms()
+                                        .format(DateTime.parse(
+                                            dataCheckIn[index].checkOut))
+                                        .toString()
+                                    : "-",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryMaroon),
                               )
                             ],
                           )
                         ],
                       ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Check In",
-                          style: TextStyle(),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "08.58",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: kPrimaryMaroon),
-                        )
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Check Out",
-                          style: TextStyle(),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "08.58",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: kPrimaryMaroon),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              );
-            },
-          )
+                    );
+                  },
+                )
         ],
       ),
     );

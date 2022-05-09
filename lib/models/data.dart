@@ -1,7 +1,5 @@
 class Data {
-  String id;
-  DateTime checkIn, checkOut;
-  int duration;
+  String id, checkIn, checkOut, duration;
 
   Data({required this.checkIn, required this.checkOut, required this.duration, required this.id});
 
@@ -10,8 +8,8 @@ class Data {
     factory Data.fromJson(Map<String, dynamic> parsedJson) {
     return Data(
         id: parsedJson['id'],
-        checkIn: parsedJson['check'],
-        checkOut: parsedJson['name'],
-        duration: parsedJson['phone']);
+        checkIn: parsedJson['checkIn'],
+        checkOut: parsedJson['checkOut'],
+        duration: parsedJson['duration']);
   }
 }

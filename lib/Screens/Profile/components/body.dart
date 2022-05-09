@@ -38,7 +38,7 @@ class Body extends StatelessWidget {
                 color: Colors.white),
             child: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               icon: Icon(Icons.arrow_back),
               color: kPrimaryMaroon,

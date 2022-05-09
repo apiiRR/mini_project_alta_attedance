@@ -10,21 +10,32 @@ class Time extends StatefulWidget {
 }
 
 class _TimeState extends State<Time> {
+  Timer? timer;
   var jam = '';
   void startJam() {
-    Timer.periodic(new Duration(seconds: 1), (_) {
+    timer = Timer.periodic(new Duration(seconds: 1), (_) {
       var tgl = new DateTime.now();
       var formatedjam = new DateFormat.Hms().format(tgl);
       setState(() {
-        jam = formatedjam;
+          jam = formatedjam;
       });
     });
   }
 
   @override
   void initState() {
-    startJam();
+    if (mounted) {
+      startJam();
+    } else {
+      return;
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
   
   @override
