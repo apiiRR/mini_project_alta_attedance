@@ -1,8 +1,22 @@
 class Account {
-  String id, name, email, password, nip, job;
+  String idUser, name, email, password, nip, job, id;
   DateTime createdAt;
 
-  Account({required this.id, required this.name, required this.email, required this.password, required this.createdAt, required this.nip, required this.job});
+  Account(
+      {required this.idUser,
+      required this.name,
+      required this.email,
+      required this.password,
+      required this.createdAt,
+      required this.nip,
+      required this.job,
+      required this.id});
 
-  Map toJson() => {'name' : name, 'email' : email.toLowerCase(), 'password' : password, 'nip' : nip, 'job' : job, 'createdAt' : createdAt.toString()};
+  Map toJson() => {
+        'name': name,
+        'email': email.toLowerCase(),
+        'password': password,
+        'nip': nip,
+        'job': job,
+      };
 }

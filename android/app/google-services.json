@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "299612108681",
+    "firebase_url": "https://mini-project-flutter-aee89-default-rtdb.firebaseio.com",
+    "project_id": "mini-project-flutter-aee89",
+    "storage_bucket": "mini-project-flutter-aee89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299612108681:android:5e5677b2986b50dbbad358",
+        "android_client_info": {
+          "package_name": "com.example.mini_project_alta_attedance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "299612108681-kil6f1v0be67hcr2u9uqdab1g2i9u5k5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCfuaWpYPeL_O3SPADFuNCeoDW5-uK77o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299612108681-kil6f1v0be67hcr2u9uqdab1g2i9u5k5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

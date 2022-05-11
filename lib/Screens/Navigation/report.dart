@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 
 import '../../components/option.dart';
 import '../../constants.dart';
+import '../../view_model/data_view_model.dart';
+import '../../view_model/profile_view_model.dart';
 import '../Profile/profile.dart';
-import 'navigation_view_model.dart';
 
 class Report extends StatefulWidget {
   const Report({Key? key}) : super(key: key);
@@ -18,8 +19,10 @@ class Report extends StatefulWidget {
 class _ReportState extends State<Report> {
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<NavigationViewModel>(context);
-    final dataCheckIn = data.data;
+    final profile = Provider.of<ProfileViewModel>(context);
+    final data = Provider.of<DataViewModel>(context);
+    final dataCheckIn = data.allData;
+    final dataProfile = profile.data[0];
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
@@ -35,16 +38,8 @@ class _ReportState extends State<Report> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(
-                              builder: (_) => ProfileScreen()))
-                          .then((value) {
-                        setState(() {
-                          print('update state');
-                          data.syncDataWithProvider();
-                          print('after update');
-                        });
-                      });
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => ProfileScreen()));
                     },
                     child: Container(
                       width: 60,
@@ -76,7 +71,7 @@ class _ReportState extends State<Report> {
                             fontFamily: 'Poppins'),
                       ),
                       Text(
-                        data.account.length > 0 ? data.account[1] : "Username",
+                        dataProfile != null ? dataProfile.name : "Username",
                         style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
                       )
                     ],

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/components/day.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/components/time.dart';
-import 'package:mini_project_alta_attedance/Screens/Navigation/navigation_view_model.dart';
+
+import 'package:mini_project_alta_attedance/view_model/data_view_model.dart';
+import 'package:mini_project_alta_attedance/view_model/profile_view_model.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -17,22 +19,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   print("init dipanggil");
-  //   WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
-  //     Provider.of<NavigationViewModel>(context, listen: false);
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<NavigationViewModel>(context);
+    final data = Provider.of<DataViewModel>(context);
+    final profile = Provider.of<ProfileViewModel>(context);
+    final dataCheckIn = data.allData;
     final currentData = data.currentData;
-    final dataCheckIn = data.data;
+    final dataProfile = profile.data[0];
+    // final currentData = data.currentData;
+    // final dataCheckIn = data.data;
     Size size = MediaQuery.of(context).size;
-    // print(currentData);
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
@@ -47,16 +43,8 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(
-                              builder: (_) => ProfileScreen()))
-                          .then((value) {
-                        setState(() {
-                          print('update state');
-                          data.syncDataWithProvider();
-                          print('after update');
-                        });
-                      });
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => ProfileScreen()));
                     },
                     child: Container(
                       width: 60,
@@ -88,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                             fontFamily: 'Poppins'),
                       ),
                       Text(
-                        data.account.length > 0 ? data.account[1] : "Username",
+                        dataProfile != null ? dataProfile.name : "Username",
                         style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
                       )
                     ],
@@ -133,14 +121,14 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "NIP : ${data.account.length > 0 ? data.account[5] : "-"}",
+                          "NIP : ${dataProfile != null ? dataProfile.nip : "-"}",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           height: size.height * 0.01,
                         ),
                         Text(
-                          "Job : ${data.account.length > 0 ? data.account[4] : "-"}",
+                          "Job : ${dataProfile != null ? dataProfile.job : "-"}",
                         ),
                       ],
                     ),
@@ -252,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: kPrimaryMaroon),
                     ),
                     Text(
-                      currentData != null
+                      currentData != null && currentData != ""
                           ? DateFormat.Hms()
                               .format(DateTime.parse(currentData.checkIn))
                               .toString()
@@ -271,7 +259,9 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("Check Out", style: TextStyle(color: kPrimaryMaroon)),
                     Text(
-                      currentData != null && currentData.checkOut != ""
+                      currentData != null &&
+                              currentData != "" &&
+                              currentData.checkOut != ""
                           ? DateFormat.Hms()
                               .format(DateTime.parse(currentData.checkOut))
                               .toString()
@@ -290,7 +280,9 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("Duration", style: TextStyle(color: kPrimaryMaroon)),
                     Text(
-                      currentData != null && currentData.duration != ""
+                      currentData != null &&
+                              currentData != "" &&
+                              currentData.duration != ""
                           ? "${currentData.duration} min"
                           : "- min",
                       style: TextStyle(
@@ -324,7 +316,8 @@ class _HomePageState extends State<HomePage> {
           ),
           dataCheckIn.isEmpty
               ? Container(
-                  margin: EdgeInsets.only(bottom: size.height * 0.07, top: size.height * 0.03),
+                  margin: EdgeInsets.only(
+                      bottom: size.height * 0.07, top: size.height * 0.03),
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),

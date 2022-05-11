@@ -3,8 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/navigation.dart';
-import 'package:mini_project_alta_attedance/provider/authservice.dart';
 import 'package:provider/provider.dart';
+import '../../../view_model/auth_view_model.dart';
 import '/Screens/Singup/singup_screen.dart';
 import '/components/rounded_button.dart';
 // import '/constants.dart';
@@ -22,6 +22,7 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<AuthViewModel>(context, listen: false);
     Size size = MediaQuery.of(context).size;
     final _formKey = GlobalKey<FormBuilderState>();
     return Background(
@@ -62,19 +63,42 @@ class Body extends StatelessWidget {
                       name: 'email',
                     ),
                     const RoundedPasswordField(),
-                    Consumer<AuthService>(
-                      builder: (context, value, child) => RoundedButton(
-                          text: "LOGIN",
-                          press: () async {
-                            context.loaderOverlay.show();
-                            _formKey.currentState!.save();
-                            value
-                                .loginUser(
-                                    email:
-                                        _formKey.currentState!.value["email"],
-                                    password: _formKey
-                                        .currentState!.value["password"])
-                                .then((value) {
+                    RoundedButton(
+                        text: "LOGIN",
+                        press: () async {
+                          context.loaderOverlay.show();
+                          _formKey.currentState!.save();
+                          auth
+                              .signIn(_formKey.currentState!.value["email"],
+                                  _formKey.currentState!.value["password"])
+                              .then((value) {
+                            if (value == true) {
+                              context.loaderOverlay.hide();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: EdgeInsets.only(bottom: 50.0),
+                                  content: Text("Login Berhasil!!"),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const Navigation()),
+                                (Route) => false,
+                              );
+                            } else {
+                              context.loaderOverlay.hide();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(value["error"]["message"]),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          });
+                          /* .then((value) {
                               if (value == false) {
                                 context.loaderOverlay.hide();
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -101,16 +125,15 @@ class Body extends StatelessWidget {
                                   (Route) => false,
                                 );
                               }
-                            });
-                            /* Navigator.pushAndRemoveUntil(
+                            }); */
+                          /* Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                 builder: (BuildContext context) => navigation(),
                               ),
                               (route) => false,
                             ); */
-                          }),
-                    ),
+                        }),
                   ],
                 )),
             SizedBox(

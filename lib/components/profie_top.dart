@@ -16,7 +16,7 @@ class ProfileTop extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+                // Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
               },
               child: Container(
                 width: 60,

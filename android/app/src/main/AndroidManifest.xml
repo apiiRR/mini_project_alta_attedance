@@ -2,7 +2,7 @@
     package="com.example.mini_project_alta_attedance">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="Micella Sayang Rafi"
+        android:label="Absence App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

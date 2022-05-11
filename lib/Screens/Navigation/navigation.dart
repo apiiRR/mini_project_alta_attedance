@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:mini_project_alta_attedance/Screens/Navigation/navigation_view_model.dart';
-import 'package:mini_project_alta_attedance/models/data.dart';
+import 'package:mini_project_alta_attedance/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
+import '../../view_model/data_view_model.dart';
 import 'report.dart';
 import '../../constants.dart';
 import 'homepage.dart';
@@ -15,6 +15,54 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> {
+  bool isInit = true;
+  bool isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (isInit) {
+      isLoading = true;
+      Provider.of<DataViewModel>(context, listen: false)
+          .inisialData()
+          .then((value) {
+        Provider.of<ProfileViewModel>(context, listen: false)
+            .inisialData()
+            .then((value) {
+          setState(() {
+            isLoading = false;
+          });
+        }).catchError(
+          (err) {
+            print(err);
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Error Occured"),
+                  content: Text(err.toString()),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isLoading = false;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Text("Okay"),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      });
+
+      isInit = false;
+    }
+    super.didChangeDependencies();
+  }
+
   int _currentIndex = 0;
   List pages = const [
     HomePage(),
@@ -23,6 +71,7 @@ class _NavigationState extends State<Navigation> {
 
   @override
   Widget build(BuildContext context) {
+    final data = Provider.of<DataViewModel>(context, listen: false);
     Size size = MediaQuery.of(context).size;
     return LoaderOverlay(
       child: Scaffold(
@@ -41,31 +90,29 @@ class _NavigationState extends State<Navigation> {
                   )),
               pages[_currentIndex]
             ])),
-        floatingActionButton: Consumer<NavigationViewModel>(
-          builder: (context, value, child) => FloatingActionButton(
-            child: const Icon(
-              Icons.fingerprint,
-              color: kPrimaryMaroon,
-              size: 45,
-            ),
-            onPressed: () async {
-              context.loaderOverlay.show();
-              switch (value.status) {
-                case true:
-                  await value.checkIn().then((value) {
-                    context.loaderOverlay.hide();
-                  });
-                  break;
-                case false:
-                  await value.checkOut().then((value) {
-                    context.loaderOverlay.hide();
-                  });
-                  break;
-                default:
-              }
-            },
-            backgroundColor: Colors.white,
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(
+            Icons.fingerprint,
+            color: kPrimaryMaroon,
+            size: 45,
           ),
+          onPressed: () async {
+            context.loaderOverlay.show();
+            switch (data.status) {
+              case true:
+                await data.checkIn().then((value) {
+                  context.loaderOverlay.hide();
+                });
+                break;
+              case false:
+                await data.checkOut().then((value) {
+                  context.loaderOverlay.hide();
+                });
+                break;
+              default:
+            }
+          },
+          backgroundColor: Colors.white,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: Container(
