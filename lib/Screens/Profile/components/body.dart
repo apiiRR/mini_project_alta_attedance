@@ -25,7 +25,7 @@ class _BodyState extends State<Body> {
   PlatformFile? pickedFile;
   UploadTask? uploadTask;
 
-  Future uploadFile() async {
+  Future<String> uploadFile() async {
     final path = 'files/${pickedFile!.name}';
     final file = File(pickedFile!.path!);
 
@@ -36,6 +36,7 @@ class _BodyState extends State<Body> {
 
     final urlDownload = await snapshot.ref.getDownloadURL();
     print("Download LINK : $urlDownload");
+    return urlDownload;
   }
 
   Future selectFile() async {
@@ -45,14 +46,11 @@ class _BodyState extends State<Body> {
     setState(() {
       pickedFile = result.files.first;
     });
-
-    uploadFile();
   }
 
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileViewModel>(context);
-    var data = profile.data[0];
     Size size = MediaQuery.of(context).size;
     final _formKey = GlobalKey<FormBuilderState>();
     return Background(
@@ -70,24 +68,34 @@ class _BodyState extends State<Body> {
                     width: 130,
                     height: 130,
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 4,
-                            color: Theme.of(context).scaffoldBackgroundColor),
-                        boxShadow: [
-                          BoxShadow(
-                              spreadRadius: 2,
-                              blurRadius: 10,
-                              color: Colors.black.withOpacity(0.1),
-                              offset: Offset(0, 1)),
-                        ],
-                        shape: BoxShape.circle,
-                        color: Colors.grey),
+                      border: Border.all(
+                          width: 4,
+                          color: Theme.of(context).scaffoldBackgroundColor),
+                      boxShadow: [
+                        BoxShadow(
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            color: Colors.black.withOpacity(0.1),
+                            offset: Offset(0, 1)),
+                      ],
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(profile.data != null &&
+                                  profile.data!.photo != ""
+                              ? profile.data!.photo
+                              : "https://firebasestorage.googleapis.com/v0/b/mini-project-flutter-aee89.appspot.com/o/files%2Fuser_profile.png?alt=media&token=5e79293e-e1d6-4e1b-a61a-07a80960e313")),
+                    ),
                   ),
                   Positioned(
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: selectFile,
+                        onTap: () {
+                          selectFile().then((value) => uploadFile()
+                              .then((url) => profile.updatePhoto(url)));
+                        },
                         child: Container(
                           height: 40,
                           width: 40,
@@ -109,10 +117,14 @@ class _BodyState extends State<Body> {
             ),
             SizedBox(height: size.height * 0.03),
             Text(
-              data != null ? data.name : "Username",
+              profile.data != null && profile.data!.name != ""
+                  ? profile.data!.name
+                  : "Name Unknown",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            Text(data != null && data.job != "" ? data.job : "Job Unknown"),
+            Text(profile.data != null && profile.data!.job != ""
+                ? profile.data!.job
+                : "Job Unknown"),
             SizedBox(height: size.height * 0.03),
             Container(
               padding:
@@ -138,37 +150,40 @@ class _BodyState extends State<Body> {
                         name: "nip",
                         labelText: "NIP",
                         isPassword: false,
-                        initial: data != null && data.nip != ""
-                            ? data.nip
-                            : "NIP Unknown"),
+                        initial: profile.data != null && profile.data!.nip != ""
+                            ? profile.data!.nip
+                            : ""),
                     TextInputProfile(
                         name: "username",
                         labelText: "Full Name",
                         isPassword: false,
-                        initial: data != null && data.name != ""
-                            ? data.name
-                            : "Job Unknown"),
+                        initial:
+                            profile.data != null && profile.data!.name != ""
+                                ? profile.data!.name
+                                : ""),
                     TextInputProfile(
                         name: "email",
                         labelText: "Email",
                         isPassword: false,
-                        initial: data != null && data.email != ""
-                            ? data.email
-                            : "Email Unknown"),
+                        initial:
+                            profile.data != null && profile.data!.email != ""
+                                ? profile.data!.email
+                                : ""),
                     TextInputProfile(
                         name: "password",
                         labelText: "Password",
                         isPassword: true,
-                        initial: data != null && data.password != ""
-                            ? data.password
-                            : "Password Unknown"),
+                        initial:
+                            profile.data != null && profile.data!.password != ""
+                                ? profile.data!.password
+                                : ""),
                     TextInputProfile(
                         name: "job",
                         labelText: "Job",
                         isPassword: false,
-                        initial: data != null && data.job != ""
-                            ? data.job
-                            : "Job Unknown"),
+                        initial: profile.data != null && profile.data!.job != ""
+                            ? profile.data!.job
+                            : ""),
                   ],
                 ),
               ),

@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:path/path.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mini_project_alta_attedance/models/account.dart';
 import 'package:mini_project_alta_attedance/models/api/profile_api.dart';
@@ -15,12 +13,12 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Account> _data = [];
-  List<Account> get data => _data;
+  Account? _data;
+  Account? get data => _data;
 
   Future<void> _authenticate() async {
-    var email = data[0].email.trim();
-    var password = data[0].password.trim();
+    var email = data!.email.trim();
+    var password = data!.password.trim();
     try {
       var data = {
         "email": email,
@@ -39,21 +37,18 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> inisialData() async {
-    print("initial");
-    _data = [];
-
     try {
       await Dio()
           .get(
               'https://mini-project-flutter-aee89-default-rtdb.firebaseio.com/accounts.json?auth=$token&orderBy="idUser"&equalTo="$userId"')
           .then((value) {
         var hasilResponse;
-
         if (value.data != null) {
           hasilResponse = value.data as Map<String, dynamic>;
           hasilResponse.forEach(
             (key, value) {
               Account acc = Account(
+                  photo: value["photo"],
                   idUser: value["idUser"],
                   name: value["name"],
                   email: value["email"],
@@ -62,7 +57,7 @@ class ProfileViewModel extends ChangeNotifier {
                   nip: value["nip"],
                   job: value["job"],
                   id: key);
-              _data.add(acc);
+              _data = acc;
             },
           );
 
@@ -79,7 +74,8 @@ class ProfileViewModel extends ChangeNotifier {
   Future updateAccount(String nip, String name, String email, String password,
       String job) async {
     Account acc = Account(
-        idUser: "",
+        photo: data!.photo,
+        idUser: data!.idUser,
         name: name,
         email: email,
         password: password,
@@ -88,7 +84,7 @@ class ProfileViewModel extends ChangeNotifier {
         job: job,
         id: "");
 
-    if (email.toLowerCase() != data[0].email) {
+    if (email.toLowerCase() != data!.email) {
       await _authenticate();
       try {
         await Dio().post(
@@ -106,7 +102,7 @@ class ProfileViewModel extends ChangeNotifier {
       }
     }
 
-    if (password != data[0].password) {
+    if (password != data!.password) {
       await _authenticate();
       try {
         await Dio().post(
@@ -124,7 +120,15 @@ class ProfileViewModel extends ChangeNotifier {
       }
     }
 
-    await ProfileAPI.updateData(token, data[0].id, acc.toJson()).then((value) {
+    await ProfileAPI.updateData(token, data!.id, acc.toJson()).then((value) {
+      inisialData();
+    });
+  }
+
+  Future updatePhoto(String url) async {
+    var dataPhoto = {"photo": url};
+    await ProfileAPI.updateData(token, data!.id, json.encode(dataPhoto))
+        .then((value) {
       inisialData();
     });
   }

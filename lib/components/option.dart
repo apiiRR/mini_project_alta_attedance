@@ -2,19 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../constants.dart';
 
-class Option extends StatelessWidget {
-  const Option({Key? key, required this.text}) : super(key: key);
+class Option extends StatefulWidget {
+  const Option({Key? key, required this.text, required this.isActive})
+      : super(key: key);
   final String text;
+  final String isActive;
 
+  @override
+  State<Option> createState() => _OptionState();
+}
+
+class _OptionState extends State<Option> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+      },
       child: Container(
         height: 36,
         decoration: BoxDecoration(
           // color: optionSelected[index] ? kPrimaryColor : Colors.white,
-          color: kPrimarygrey,
+          color: widget.isActive == widget.text ? kPrimaryMaroon : kPrimarygrey,
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             BoxShadow(
@@ -28,7 +36,7 @@ class Option extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Center(
           child: Text(
-            text,
+            widget.text,
             style: TextStyle(
                 // color: optionSelected[index] ? Colors.white : Colors.black,
                 fontSize: 14,

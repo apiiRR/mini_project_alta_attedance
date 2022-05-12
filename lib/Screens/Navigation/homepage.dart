@@ -23,9 +23,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final data = Provider.of<DataViewModel>(context);
     final profile = Provider.of<ProfileViewModel>(context);
-    final dataCheckIn = data.allData;
     final currentData = data.currentData;
-    final dataProfile = profile.data[0];
     // final currentData = data.currentData;
     // final dataCheckIn = data.data;
     Size size = MediaQuery.of(context).size;
@@ -50,18 +48,25 @@ class _HomePageState extends State<HomePage> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(0.1),
-                                offset: Offset(0, 1)),
-                          ],
-                          shape: BoxShape.circle,
-                          color: Colors.grey),
+                        border: Border.all(
+                            width: 4,
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                        boxShadow: [
+                          BoxShadow(
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              color: Colors.black.withOpacity(0.1),
+                              offset: Offset(0, 1)),
+                        ],
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: NetworkImage(profile.data != null &&
+                                    profile.data!.photo != ""
+                                ? profile.data!.photo
+                                : "https://firebasestorage.googleapis.com/v0/b/mini-project-flutter-aee89.appspot.com/o/files%2Fuser_profile.png?alt=media&token=5e79293e-e1d6-4e1b-a61a-07a80960e313")),
+                      ),
                     ),
                   ),
                   SizedBox(width: 15),
@@ -76,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                             fontFamily: 'Poppins'),
                       ),
                       Text(
-                        dataProfile != null ? dataProfile.name : "Username",
+                        profile.data != null ? profile.data!.name : "Username",
                         style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
                       )
                     ],
@@ -121,14 +126,14 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "NIP : ${dataProfile != null ? dataProfile.nip : "-"}",
+                          "NIP : ${profile.data != null && profile.data!.nip != "" ? profile.data!.nip : "-"}",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           height: size.height * 0.01,
                         ),
                         Text(
-                          "Job : ${dataProfile != null ? dataProfile.job : "-"}",
+                          "Job : ${profile.data != null && profile.data!.job != "" ? profile.data!.job : "-"}",
                         ),
                       ],
                     ),
@@ -216,11 +221,8 @@ class _HomePageState extends State<HomePage> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: kPrimaryPink,
               borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(
-                  image: AssetImage("assets/images/Group_179.png"),
-                  fit: BoxFit.cover),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.3),
@@ -314,7 +316,7 @@ class _HomePageState extends State<HomePage> {
               //     ))
             ],
           ),
-          dataCheckIn.isEmpty
+          data.aWeek.isEmpty
               ? Container(
                   margin: EdgeInsets.only(
                       bottom: size.height * 0.07, top: size.height * 0.03),
@@ -336,7 +338,7 @@ class _HomePageState extends State<HomePage> {
                   ))
               : ListView.builder(
                   shrinkWrap: true,
-                  itemCount: dataCheckIn.length,
+                  itemCount: data.aWeek.length,
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Container(
@@ -371,7 +373,7 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   DateFormat('dd')
                                       .format(DateTime.parse(
-                                          dataCheckIn[index].checkIn))
+                                          data.aWeek[index].checkIn))
                                       .toString(),
                                   style: TextStyle(
                                       color: kPrimaryMaroon,
@@ -388,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       DateFormat('E')
                                           .format(DateTime.parse(
-                                              dataCheckIn[index].checkIn))
+                                              data.aWeek[index].checkIn))
                                           .toString(),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -397,7 +399,7 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       DateFormat('MMMM')
                                           .format(DateTime.parse(
-                                              dataCheckIn[index].checkIn))
+                                              data.aWeek[index].checkIn))
                                           .toString(),
                                       style: TextStyle(fontSize: 16),
                                     )
@@ -419,7 +421,7 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                 DateFormat.Hms()
                                     .format(DateTime.parse(
-                                        dataCheckIn[index].checkIn))
+                                        data.aWeek[index].checkIn))
                                     .toString(),
                                 style: TextStyle(
                                     fontSize: 16,
@@ -439,10 +441,10 @@ class _HomePageState extends State<HomePage> {
                                 height: 8,
                               ),
                               Text(
-                                dataCheckIn[index].checkOut != ""
+                                data.aWeek[index].checkOut != ""
                                     ? DateFormat.Hms()
                                         .format(DateTime.parse(
-                                            dataCheckIn[index].checkOut))
+                                            data.aWeek[index].checkOut))
                                         .toString()
                                     : "-",
                                 style: TextStyle(

@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-import '../../components/option.dart';
 import '../../constants.dart';
 import '../../view_model/data_view_model.dart';
 import '../../view_model/profile_view_model.dart';
@@ -17,12 +16,11 @@ class Report extends StatefulWidget {
 }
 
 class _ReportState extends State<Report> {
+  int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileViewModel>(context);
     final data = Provider.of<DataViewModel>(context);
-    final dataCheckIn = data.allData;
-    final dataProfile = profile.data[0];
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
@@ -45,18 +43,25 @@ class _ReportState extends State<Report> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(0.1),
-                                offset: Offset(0, 1)),
-                          ],
-                          shape: BoxShape.circle,
-                          color: Colors.grey),
+                        border: Border.all(
+                            width: 4,
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                        boxShadow: [
+                          BoxShadow(
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              color: Colors.black.withOpacity(0.1),
+                              offset: Offset(0, 1)),
+                        ],
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: NetworkImage(profile.data != null &&
+                                    profile.data!.photo != ""
+                                ? profile.data!.photo
+                                : "https://firebasestorage.googleapis.com/v0/b/mini-project-flutter-aee89.appspot.com/o/files%2Fuser_profile.png?alt=media&token=5e79293e-e1d6-4e1b-a61a-07a80960e313")),
+                      ),
                     ),
                   ),
                   SizedBox(width: 15),
@@ -71,7 +76,9 @@ class _ReportState extends State<Report> {
                             fontFamily: 'Poppins'),
                       ),
                       Text(
-                        dataProfile != null ? dataProfile.name : "Username",
+                        profile.data != null && profile.data!.name != ""
+                            ? profile.data!.name
+                            : "Name Unknown",
                         style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
                       )
                     ],
@@ -98,55 +105,55 @@ class _ReportState extends State<Report> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Option(text: 'All'),
+                Option(text: 'All', index: 0),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'January'),
+                Option(text: 'January', index: 1),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'February'),
+                Option(text: 'February', index: 2),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'Maret'),
+                Option(text: 'Maret', index: 3),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'April'),
+                Option(text: 'April', index: 4),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'May'),
+                Option(text: 'May', index: 5),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'June'),
+                Option(text: 'June', index: 6),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'July'),
+                Option(text: 'July', index: 7),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'August'),
+                Option(text: 'August', index: 8),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'September'),
+                Option(text: 'September', index: 9),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'October'),
+                Option(text: 'October', index: 10),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'November'),
+                Option(text: 'November', index: 11),
                 const SizedBox(
                   width: 8,
                 ),
-                Option(text: 'December'),
+                Option(text: 'December', index: 12),
               ],
             ),
           ),
@@ -221,9 +228,12 @@ class _ReportState extends State<Report> {
                   fontSize: 24,
                 ),
               ),
+              IconButton(onPressed: () {
+                data.exportPDF();
+              }, icon: Icon(Icons.download, size: 32,), color: kPrimaryMaroon,),
             ],
           ),
-          dataCheckIn.isEmpty
+          data.aMonth.isEmpty
               ? Container(
                   margin: EdgeInsets.only(
                       bottom: size.height * 0.3, top: size.height * 0.03),
@@ -245,7 +255,7 @@ class _ReportState extends State<Report> {
                   ))
               : ListView.builder(
                   shrinkWrap: true,
-                  itemCount: dataCheckIn.length,
+                  itemCount: data.aMonth.length,
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Container(
@@ -267,7 +277,8 @@ class _ReportState extends State<Report> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 1),
                             width: 100,
                             height: 60,
                             decoration: BoxDecoration(
@@ -280,7 +291,7 @@ class _ReportState extends State<Report> {
                                 Text(
                                   DateFormat('dd')
                                       .format(DateTime.parse(
-                                          dataCheckIn[index].checkIn))
+                                          data.aMonth[index].checkIn))
                                       .toString(),
                                   style: TextStyle(
                                       color: kPrimaryMaroon,
@@ -297,7 +308,7 @@ class _ReportState extends State<Report> {
                                     Text(
                                       DateFormat('E')
                                           .format(DateTime.parse(
-                                              dataCheckIn[index].checkIn))
+                                              data.aMonth[index].checkIn))
                                           .toString(),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -306,7 +317,7 @@ class _ReportState extends State<Report> {
                                     Text(
                                       DateFormat('MMMM')
                                           .format(DateTime.parse(
-                                              dataCheckIn[index].checkIn))
+                                              data.aMonth[index].checkIn))
                                           .toString(),
                                       style: TextStyle(fontSize: 16),
                                     )
@@ -328,7 +339,7 @@ class _ReportState extends State<Report> {
                               Text(
                                 DateFormat.Hms()
                                     .format(DateTime.parse(
-                                        dataCheckIn[index].checkIn))
+                                        data.aMonth[index].checkIn))
                                     .toString(),
                                 style: TextStyle(
                                     fontSize: 16,
@@ -348,10 +359,10 @@ class _ReportState extends State<Report> {
                                 height: 8,
                               ),
                               Text(
-                                dataCheckIn[index].checkOut != ""
+                                data.aMonth[index].checkOut != ""
                                     ? DateFormat.Hms()
                                         .format(DateTime.parse(
-                                            dataCheckIn[index].checkOut))
+                                            data.aMonth[index].checkOut))
                                         .toString()
                                     : "-",
                                 style: TextStyle(
@@ -367,6 +378,45 @@ class _ReportState extends State<Report> {
                   },
                 )
         ],
+      ),
+    );
+  }
+
+  Widget Option({required String text, required int index}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+
+        Provider.of<DataViewModel>(context, listen: false).filterMonth(index);
+      },
+      child: Container(
+        height: 36,
+        decoration: BoxDecoration(
+          // color: optionSelected[index] ? kPrimaryColor : Colors.white,
+          color: _currentIndex == index ? kPrimaryMaroon : kPrimarygrey,
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 8,
+              offset: const Offset(0, 0),
+            )
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+                // color: optionSelected[index] ? Colors.white : Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
+          ),
+        ),
       ),
     );
   }

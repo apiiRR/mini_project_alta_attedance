@@ -112,6 +112,7 @@ class AuthViewModel with ChangeNotifier {
 
     if (data == true) {
       var userData = Account(
+          photo: "",
           id: "",
           idUser: _userId!,
           name: name,

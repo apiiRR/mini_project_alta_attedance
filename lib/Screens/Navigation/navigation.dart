@@ -16,47 +16,13 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   bool isInit = true;
-  bool isLoading = false;
 
   @override
   void didChangeDependencies() {
-    if (isInit) {
-      isLoading = true;
-      Provider.of<DataViewModel>(context, listen: false)
-          .inisialData()
-          .then((value) {
-        Provider.of<ProfileViewModel>(context, listen: false)
-            .inisialData()
-            .then((value) {
-          setState(() {
-            isLoading = false;
-          });
-        }).catchError(
-          (err) {
-            print(err);
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text("Error Occured"),
-                  content: Text(err.toString()),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          isLoading = false;
-                        });
-                        Navigator.pop(context);
-                      },
-                      child: Text("Okay"),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        );
-      });
+    if (isInit == true) {
+      Provider.of<DataViewModel>(context, listen: false).inisialData();
+
+      Provider.of<ProfileViewModel>(context, listen: false).inisialData();
 
       isInit = false;
     }
@@ -80,15 +46,19 @@ class _NavigationState extends State<Navigation> {
             height: size.height,
             child: Stack(alignment: Alignment.center, children: [
               Positioned(
-                  top: 0,
+                  top: -55,
                   left: 0,
                   right: 0,
                   height: size.height * 0.5,
                   child: Image.asset(
-                    "assets/images/Illustration-background_1.png",
+                    "assets/images/Illustration-background_3.png",
                     fit: BoxFit.fill,
                   )),
-              pages[_currentIndex]
+              isInit
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : pages[_currentIndex]
             ])),
         floatingActionButton: FloatingActionButton(
           child: const Icon(
@@ -173,7 +143,7 @@ class _NavigationState extends State<Navigation> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.data_exploration,
+                          Icons.description_outlined,
                           color: _currentIndex == 1
                               ? kPrimaryMaroon
                               : kPrimarygrey,
