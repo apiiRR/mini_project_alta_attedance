@@ -6,6 +6,7 @@ import '../../view_model/data_view_model.dart';
 import 'report.dart';
 import '../../constants.dart';
 import 'homepage.dart';
+import '../Profile/profile.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({Key? key}) : super(key: key);
@@ -37,29 +38,66 @@ class _NavigationState extends State<Navigation> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = Provider.of<ProfileViewModel>(context);
     final data = Provider.of<DataViewModel>(context, listen: false);
     Size size = MediaQuery.of(context).size;
     return LoaderOverlay(
       child: Scaffold(
-        body: Container(
-            width: double.infinity,
-            height: size.height,
-            child: Stack(alignment: Alignment.center, children: [
-              Positioned(
-                  top: -55,
-                  left: 0,
-                  right: 0,
-                  height: size.height * 0.5,
-                  child: Image.asset(
-                    "assets/images/Illustration-background_3.png",
-                    fit: BoxFit.fill,
-                  )),
-              isInit
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : pages[_currentIndex]
-            ])),
+        appBar: AppBar(
+          backgroundColor: kPrimaryMaroon,
+          leading: Container(
+            margin: EdgeInsets.only(left: size.width * 0.05),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 1, color: Theme.of(context).scaffoldBackgroundColor),
+              boxShadow: [
+                BoxShadow(
+                    spreadRadius: 2,
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.1),
+                    offset: Offset(0, 1)),
+              ],
+              shape: BoxShape.circle,
+              color: Colors.white,
+              image: DecorationImage(
+                  scale: 0.5,
+                  fit: BoxFit.contain,
+                  image: NetworkImage(profile.data != null &&
+                          profile.data!.photo != ""
+                      ? profile.data!.photo
+                      : "https://firebasestorage.googleapis.com/v0/b/mini-project-flutter-aee89.appspot.com/o/files%2Fuser_profile.png?alt=media&token=5e79293e-e1d6-4e1b-a61a-07a80960e313")),
+            ),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                profile.data != null ? profile.data!.name : "Username",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                profile.data != null ? profile.data!.job : "",
+                style: TextStyle(fontSize: 14),
+              )
+            ],
+          ),
+          actions: [
+            Container(
+              margin: EdgeInsets.only(right: size.width * 0.02),
+              child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => ProfileScreen()));
+                  },
+                  icon: Icon(Icons.settings)),
+            )
+          ],
+        ),
+        body: isInit
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : pages[_currentIndex],
         floatingActionButton: FloatingActionButton(
           child: const Icon(
             Icons.fingerprint,

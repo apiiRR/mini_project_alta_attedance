@@ -7,7 +7,7 @@ class Day extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
-    var result = DateFormat('E, dd MMMM').format(now);
+    var result = DateFormat('EEEE, dd MMMM yyyy').format(now);
     return Text(
       result
     );

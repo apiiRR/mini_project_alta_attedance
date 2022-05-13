@@ -53,13 +53,26 @@ class _BodyState extends State<Body> {
     final profile = Provider.of<ProfileViewModel>(context);
     Size size = MediaQuery.of(context).size;
     final _formKey = GlobalKey<FormBuilderState>();
-    return Background(
-      child: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: kPrimaryMaroon,
+        leading: Container(
+          margin: EdgeInsets.only(left: size.width * 0.02),
+          child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back_ios)),
+        ),
+        title: Text("Profile", style: TextStyle(fontWeight: FontWeight.bold),),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
         child: Column(
           children: [
             SizedBox(
-              height: size.height * 0.09,
+              height: size.height * 0.04,
             ),
             Center(
               child: Stack(
@@ -268,30 +281,6 @@ class _BodyState extends State<Body> {
           ],
         ),
       ),
-      childBottom: Positioned(
-          top: size.height * 0.05,
-          left: size.width * 0.05,
-          child: Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.1),
-                      offset: Offset(0, 1)),
-                ],
-                color: Colors.white),
-            child: IconButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              icon: Icon(Icons.arrow_back),
-              color: kPrimaryMaroon,
-            ),
-          )),
     );
   }
 }
