@@ -26,21 +26,27 @@ class _BodyState extends State<Body> {
   UploadTask? uploadTask;
 
   Future<String> uploadFile() async {
-    final path = 'files/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
+    var urlPhoto;
+    if (pickedFile != null) {
+      final path = 'files/${pickedFile!.name}';
+      final file = File(pickedFile!.path!);
 
-    final ref = FirebaseStorage.instance.ref().child(path);
-    uploadTask = ref.putFile(file);
+      final ref = FirebaseStorage.instance.ref().child(path);
+      uploadTask = ref.putFile(file);
 
-    final snapshot = await uploadTask!.whenComplete(() {});
+      final snapshot = await uploadTask!.whenComplete(() {});
 
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    print("Download LINK : $urlDownload");
-    return urlDownload;
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      print("Download LINK : $urlDownload");
+      urlPhoto = urlDownload;
+    }
+
+    return urlPhoto;
   }
 
   Future selectFile() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png']);
     if (result == null) return;
 
     setState(() {
@@ -64,7 +70,10 @@ class _BodyState extends State<Body> {
               },
               icon: Icon(Icons.arrow_back_ios)),
         ),
-        title: Text("Profile", style: TextStyle(fontWeight: FontWeight.bold),),
+        title: Text(
+          "Profil",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -106,8 +115,61 @@ class _BodyState extends State<Body> {
                       right: 0,
                       child: GestureDetector(
                         onTap: () {
-                          selectFile().then((value) => uploadFile()
-                              .then((url) => profile.updatePhoto(url)));
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text("Foto Profil"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("*Format dokument jpg, png"),
+                                        ElevatedButton(
+                                            onPressed: () async {
+                                              await selectFile();
+                                            },
+                                            child: const Text("Unggah"),
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                      kPrimaryMaroon),
+                                            )),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            "Batal",
+                                            style: TextStyle(
+                                                color: kPrimaryMaroon),
+                                          )),
+                                      TextButton(
+                                          onPressed: () async {
+                                            if (pickedFile != null) {
+                                              Navigator.pop(context);
+                                              await uploadFile().then((value) =>
+                                                  profile.updatePhoto(value));
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      "foto belum diunggah"),
+                                                  duration:
+                                                      Duration(seconds: 2),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: const Text(
+                                            "Kirim",
+                                            style: TextStyle(
+                                                color: kPrimaryMaroon),
+                                          )),
+                                    ],
+                                  ));
                         },
                         child: Container(
                           height: 40,
@@ -175,13 +237,13 @@ class _BodyState extends State<Body> {
                                 ? profile.data!.name
                                 : ""),
                     TextInputProfile(
-                        name: "email",
-                        labelText: "Email",
-                        isPassword: false,
-                        initial:
-                            profile.data != null && profile.data!.email != ""
-                                ? profile.data!.email
-                                : ""),
+                      name: "email",
+                      labelText: "Email",
+                      isPassword: false,
+                      initial: profile.data != null && profile.data!.email != ""
+                          ? profile.data!.email
+                          : "",
+                    ),
                     TextInputProfile(
                         name: "password",
                         labelText: "Password",
@@ -231,14 +293,14 @@ class _BodyState extends State<Body> {
                           context.loaderOverlay.hide();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Update Successfull"),
+                              content: Text("Memperbarui data berhasil"),
                               duration: Duration(seconds: 2),
                             ),
                           );
                         });
                       },
                       child: Text(
-                        "Update",
+                        "Perbarui",
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -254,22 +316,49 @@ class _BodyState extends State<Body> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20))),
                         elevation: MaterialStateProperty.all(2)),
-                    onPressed: () async {
-                      context.loaderOverlay.show();
-                      await Provider.of<AuthViewModel>(context, listen: false)
-                          .logOut()
-                          .then((value) {
-                        context.loaderOverlay.hide();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const WelcomeScreen()),
-                          (Route) => false,
-                        );
-                      });
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: const Text("Keluar"),
+                                content: const Text(
+                                    "Anda akan kembali ke halaman depan"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        "Batal",
+                                        style: TextStyle(color: kPrimaryMaroon),
+                                      )),
+                                  TextButton(
+                                      onPressed: () async {
+                                        context.loaderOverlay.show();
+                                        await Provider.of<AuthViewModel>(
+                                                context,
+                                                listen: false)
+                                            .logOut()
+                                            .then((value) {
+                                          context.loaderOverlay.hide();
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const WelcomeScreen()),
+                                            (Route) => false,
+                                          );
+                                        });
+                                      },
+                                      child: const Text(
+                                        "Keluar",
+                                        style: TextStyle(color: kPrimaryMaroon),
+                                      )),
+                                ],
+                              ));
                     },
                     child: Text(
-                      "Logout",
+                      "Keluar",
                       style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,

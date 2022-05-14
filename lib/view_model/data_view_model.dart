@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_project_alta_attedance/models/api/data_api.dart';
+import '../models/account.dart';
 import '../models/data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -53,12 +54,16 @@ class DataViewModel extends ChangeNotifier {
                   checkOut: value["checkOut"],
                   duration: value["duration"],
                   id: key,
-                  userId: value["userId"]);
-              if (value["checkOut"] != "" && value["duration"] != "") {
-                _allData.add(prod);
-              } else {
+                  userId: value["userId"],
+                  status: value["status"],
+                  doc: value["doc"]);
+              if (value["checkOut"] == "" &&
+                  value["duration"] == "" &&
+                  value["status"] == "hadir") {
                 currentData = prod;
                 status = false;
+              } else {
+                _allData.add(prod);
               }
             },
           );
@@ -75,7 +80,11 @@ class DataViewModel extends ChangeNotifier {
             return (b.checkIn).compareTo((a.checkIn));
           });
 
-          _aWeek = allData.sublist(0, 5);
+          if (allData.isNotEmpty && allData.length > 5) {
+            _aWeek = allData.sublist(0, 5);
+          } else {
+            _aWeek = allData;
+          }
           _aMonth = allData;
 
           notifyListeners();
@@ -136,12 +145,50 @@ class DataViewModel extends ChangeNotifier {
                     checkOut: "",
                     duration: "",
                     id: "",
-                    userId: userId!)
+                    userId: userId!,
+                    status: "hadir",
+                    doc: "")
                 .toJson(),
             token)
         .then((value) {
       inisialData();
       status = false;
+    });
+  }
+
+  Future checkInSakit(bukti) async {
+    await DataAPI.checkIn(
+            Data(
+                    checkIn: DateTime.now().toString(),
+                    checkOut: "",
+                    duration: "",
+                    id: "",
+                    userId: userId!,
+                    status: "sakit",
+                    doc: bukti)
+                .sakitToJson(),
+            token)
+        .then((value) {
+      inisialData();
+      status = true;
+    });
+  }
+
+  Future checkInCuti(date) async {
+    await DataAPI.checkIn(
+            Data(
+                    checkIn: date.toString(),
+                    checkOut: "",
+                    duration: "",
+                    id: "",
+                    userId: userId!,
+                    status: "cuti",
+                    doc: "")
+                .cutiToJson(),
+            token)
+        .then((value) {
+      inisialData();
+      status = true;
     });
   }
 
@@ -178,7 +225,7 @@ class DataViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  exportPDF() async {
+  exportPDF(Account user) async {
     final pdf = pw.Document();
 
     pdf.addPage(pw.MultiPage(
@@ -186,25 +233,56 @@ class DataViewModel extends ChangeNotifier {
         build: (pw.Context context) {
           return [
             pw.Container(
-                color: PdfColors.red800,
-                alignment: pw.Alignment.center,
                 width: double.infinity,
-                child: pw.Text("UJI COBA PDF",
-                    style: pw.TextStyle(
-                      fontSize: 50,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.white,
-                    )))
+                child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text("NIP : ${user.nip}"),
+                      pw.Text("Nama : ${user.name}"),
+                      pw.Text("Email : ${user.email}"),
+                      pw.Text("Job : ${user.job}"),
+                      pw.Divider(thickness: 2),
+                      pw.Table(border: pw.TableBorder.all(), children: [
+                        pw.TableRow(children: [
+                          pw.Text("Tanggal"),
+                          pw.Text("Check In"),
+                          pw.Text("Check Out"),
+                          pw.Text("Durasi"),
+                          pw.Text("Kehadiran")
+                        ]),
+                      ]),
+                      pw.Table(
+                        border: pw.TableBorder.all(),
+                        children: aMonth
+                            .map((e) => pw.TableRow(children: [
+                                  pw.Text(DateFormat('dd MMMM yyyy')
+                                      .format(DateTime.parse(e.checkIn))),
+                                  pw.Text(e.checkIn != ""
+                                      ? DateFormat.Hms()
+                                          .format(DateTime.parse(e.checkIn))
+                                      : "-"),
+                                  pw.Text(e.checkOut != ""
+                                      ? DateFormat.Hms()
+                                          .format(DateTime.parse(e.checkOut))
+                                      : "-"),
+                                  pw.Text(e.duration != ""
+                                      ? "${e.duration} menit"
+                                      : "-"),
+                                  pw.Text(e.status)
+                                ]))
+                            .toList(),
+                      )
+                    ]))
           ];
         }));
 
-        Uint8List bytes = await pdf.save();
+    Uint8List bytes = await pdf.save();
 
-        final dir = await getApplicationDocumentsDirectory();
-        final file = File('${dir.path}/report.pdf');
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/report.pdf');
 
-        await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes);
 
-        await OpenFile.open(file.path);
+    await OpenFile.open(file.path);
   }
 }

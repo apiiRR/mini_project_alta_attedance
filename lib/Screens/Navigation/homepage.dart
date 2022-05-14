@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/components/day.dart';
@@ -19,6 +23,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  PlatformFile? pickedFile;
+  UploadTask? uploadTask;
+
+  Future<String> uploadFile() async {
+    var urlPhoto;
+    if (pickedFile != null) {
+      final path = 'files/${pickedFile!.name}';
+      final file = File(pickedFile!.path!);
+
+      final ref = FirebaseStorage.instance.ref().child(path);
+      uploadTask = ref.putFile(file);
+
+      final snapshot = await uploadTask!.whenComplete(() {});
+
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      print("Download LINK : $urlDownload");
+      urlPhoto = urlDownload;
+    }
+
+    return urlPhoto;
+  }
+
+  Future selectFile() async {
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+    if (result == null) return;
+
+    setState(() {
+      pickedFile = result.files.first;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<DataViewModel>(context);
@@ -150,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     Text(
-                      "Check In",
+                      "Masuk",
                       style: TextStyle(color: Colors.white),
                     ),
                     Text(
@@ -171,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Column(
                   children: [
-                    Text("Check Out", style: TextStyle(color: Colors.white)),
+                    Text("Keluar", style: TextStyle(color: Colors.white)),
                     Text(
                       currentData != null &&
                               currentData != "" &&
@@ -192,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Column(
                   children: [
-                    Text("Duration", style: TextStyle(color: Colors.white)),
+                    Text("Durasi", style: TextStyle(color: Colors.white)),
                     Text(
                       currentData != null &&
                               currentData != "" &&
@@ -233,7 +269,65 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      title: const Text("Izin Sakit"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                              "Silahkan ungggah surat izin sakit anda dalam format pdf*"),
+                                          ElevatedButton(
+                                              onPressed: () async {
+                                                await selectFile();
+                                              },
+                                              child: const Text("Unggah"),
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                        kPrimaryMaroon),
+                                              )),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(
+                                              "Batal",
+                                              style: TextStyle(
+                                                  color: kPrimaryMaroon),
+                                            )),
+                                        TextButton(
+                                            onPressed: () async {
+                                              if (pickedFile != null) {
+                                                Navigator.pop(context);
+                                                await uploadFile().then(
+                                                    (value) => data
+                                                        .checkInSakit(value));
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        "dokumen belum diunggah"),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: const Text(
+                                              "Kirim",
+                                              style: TextStyle(
+                                                  color: kPrimaryMaroon),
+                                            )),
+                                      ],
+                                    ));
+                          },
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 vertical: 6, horizontal: 10),
@@ -252,14 +346,14 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.add_circle_outlined,
                                   color: kPrimaryMaroon,
                                 ),
                                 SizedBox(
                                   width: size.width * 0.01,
                                 ),
-                                Text(
+                                const Text(
                                   "Izin Sakit",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -269,7 +363,19 @@ class _HomePageState extends State<HomePage> {
                             ),
                           )),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            var selectedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2022),
+                                lastDate: DateTime(2023),
+                                confirmText: "Cuti",
+                                cancelText: "Batal");
+
+                            if (selectedDate != null) {
+                              await data.checkInCuti(selectedDate);
+                            }
+                          },
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 vertical: 6, horizontal: 10),
@@ -315,7 +421,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Last 5 days",
+                "Data 5 hari terakhir",
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 18,
@@ -357,122 +463,222 @@ class _HomePageState extends State<HomePage> {
                   itemCount: data.aWeek.length,
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 2,
-                            offset: Offset(0, 2), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(5),
-                            width: 100,
-                            height: 60,
+                    return data.aWeek[index].status == "hadir"
+                        ? Container(
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: kPrimaryPink,
                               borderRadius: BorderRadius.circular(8),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 2,
+                                  offset: Offset(
+                                      0, 2), // changes position of shadow
+                                ),
+                              ],
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text(
-                                  DateFormat('dd')
-                                      .format(DateTime.parse(
-                                          data.aWeek[index].checkIn))
-                                      .toString(),
-                                  style: TextStyle(
-                                      color: kPrimaryMaroon,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 36),
-                                ),
-                                SizedBox(
-                                  width: 6,
+                                Container(
+                                  padding: EdgeInsets.all(5),
+                                  width: 100,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: kPrimaryPink,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        DateFormat('dd')
+                                            .format(DateTime.parse(
+                                                data.aWeek[index].checkIn))
+                                            .toString(),
+                                        style: TextStyle(
+                                            color: kPrimaryMaroon,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 36),
+                                      ),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            DateFormat('E')
+                                                .format(DateTime.parse(
+                                                    data.aWeek[index].checkIn))
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            DateFormat('MMMM')
+                                                .format(DateTime.parse(
+                                                    data.aWeek[index].checkIn))
+                                                .toString(),
+                                            style: TextStyle(fontSize: 16),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      DateFormat('E')
+                                      "Masuk",
+                                      style: TextStyle(),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      DateFormat.Hms()
                                           .format(DateTime.parse(
                                               data.aWeek[index].checkIn))
                                           .toString(),
                                       style: TextStyle(
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16),
+                                          color: kPrimaryMaroon),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Keluar",
+                                      style: TextStyle(),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
                                     ),
                                     Text(
-                                      DateFormat('MMMM')
-                                          .format(DateTime.parse(
-                                              data.aWeek[index].checkIn))
-                                          .toString(),
-                                      style: TextStyle(fontSize: 16),
+                                      data.aWeek[index].checkOut != ""
+                                          ? DateFormat.Hms()
+                                              .format(DateTime.parse(
+                                                  data.aWeek[index].checkOut))
+                                              .toString()
+                                          : "-",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: kPrimaryMaroon),
                                     )
                                   ],
                                 )
                               ],
                             ),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Check In",
-                                style: TextStyle(),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                DateFormat.Hms()
-                                    .format(DateTime.parse(
-                                        data.aWeek[index].checkIn))
-                                    .toString(),
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: kPrimaryMaroon),
-                              )
-                            ],
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Check Out",
-                                style: TextStyle(),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                data.aWeek[index].checkOut != ""
-                                    ? DateFormat.Hms()
-                                        .format(DateTime.parse(
-                                            data.aWeek[index].checkOut))
-                                        .toString()
-                                    : "-",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: kPrimaryMaroon),
-                              )
-                            ],
                           )
-                        ],
-                      ),
-                    );
+                        : Container(
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xFFE0E0E0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 2,
+                                  offset: Offset(
+                                      0, 2), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: size.width * 0.02,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(5),
+                                  width: 100,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFBDBDBD),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        DateFormat('dd')
+                                            .format(DateTime.parse(
+                                                data.aWeek[index].checkIn))
+                                            .toString(),
+                                        style: const TextStyle(
+                                            color: Color(0xFF333333),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 36),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            DateFormat('E')
+                                                .format(DateTime.parse(
+                                                    data.aWeek[index].checkIn))
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            DateFormat('MMMM')
+                                                .format(DateTime.parse(
+                                                    data.aWeek[index].checkIn))
+                                                .toString(),
+                                            style: TextStyle(fontSize: 16),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: size.width * 0.15,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Keterangan",
+                                      style: TextStyle(),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      "Izin ${data.aWeek[index].status}",
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
                   },
                 )
         ],

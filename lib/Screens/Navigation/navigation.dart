@@ -156,7 +156,7 @@ class _NavigationState extends State<Navigation> {
                           size: 36,
                         ),
                         Text(
-                          'Home',
+                          'Beranda',
                           style: TextStyle(
                               color: _currentIndex == 0
                                   ? kPrimaryMaroon
@@ -188,7 +188,7 @@ class _NavigationState extends State<Navigation> {
                           size: 36,
                         ),
                         Text(
-                          'Report',
+                          'Riwayat',
                           style: TextStyle(
                               color: _currentIndex == 1
                                   ? kPrimaryMaroon

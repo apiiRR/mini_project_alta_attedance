@@ -26,7 +26,7 @@ class _TextInputProfileState extends State<TextInputProfile> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
       child: FormBuilderTextField(
-        style: TextStyle(
+        style: const TextStyle(
             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
         name: widget.name,
         initialValue: widget.initial,
