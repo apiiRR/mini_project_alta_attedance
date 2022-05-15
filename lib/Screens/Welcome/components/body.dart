@@ -25,24 +25,68 @@ class Body extends StatelessWidget {
               "assets/icons/Illustration-welcome.svg",
               height: size.height * 0.30,
             ),
-            SizedBox(height: size.height * 0.05,),
-            Text("Welcome", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Poppins'),),
-            SizedBox(height: size.height * 0.02,),
-            Text("The attendance application for employees enable accurate time tracking", textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),),
-            SizedBox(height: size.height * 0.02,),
+            SizedBox(
+              height: size.height * 0.05,
+            ),
+            Text(
+              "Welcome",
+              style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Poppins'),
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            Text(
+              "The attendance application for employees enable accurate time tracking",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'Poppins'),
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            ),
             RoundedButton(
               text: "Login",
               press: () {
-                Navigator.push(context, MaterialPageRoute(builder:  (_) {
+                /* Navigator.push(context, MaterialPageRoute(builder: (_) {
                   return const LoginScreen();
-                }));
+                })); */
+                Navigator.of(context).push(PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return LoginScreen();
+                    },
+                    transitionDuration: Duration(seconds: 1),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation.drive(Tween(begin: 0.0, end: 1.0)),
+                        child: child,
+                      );
+                    }));
               },
             ),
             RoundedButton(
               text: "Sign Up",
               textColor: Colors.white,
-              press: (){
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SignUpScreen()));
+              press: () {
+                /* Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const SignUpScreen())); */
+                Navigator.of(context).push(PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return SignUpScreen();
+                    },
+                    transitionDuration: Duration(seconds: 1),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation.drive(Tween(begin: 0.0, end: 1.0)),
+                        child: child,
+                      );
+                    }));
               },
             ),
           ],

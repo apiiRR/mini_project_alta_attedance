@@ -86,8 +86,21 @@ class _NavigationState extends State<Navigation> {
               margin: EdgeInsets.only(right: size.width * 0.02),
               child: IconButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => ProfileScreen()));
+                    /* Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => ProfileScreen())); */
+                    Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return ProfileScreen();
+                        },
+                        transitionDuration: Duration(seconds: 1),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(
+                            opacity:
+                                animation.drive(Tween(begin: 0.0, end: 1.0)),
+                            child: child,
+                          );
+                        }));
                   },
                   icon: Icon(Icons.settings)),
             )

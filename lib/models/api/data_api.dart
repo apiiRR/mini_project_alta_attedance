@@ -7,16 +7,14 @@ class DataAPI {
           .get(
               'https://mini-project-flutter-aee89-default-rtdb.firebaseio.com/datas.json?auth=$token&orderBy="userId"&equalTo="$userId"')
           .then((value) {
-        var hasilResponse;
-
         if (value.data != null) {
-          hasilResponse = value.data as Map<String, dynamic>;
+          return value.data as Map<String, dynamic>;
         } else {
-          hasilResponse = null;
+          return null;
         }
 
-        print("response $hasilResponse");
-        return hasilResponse;
+        // print("response $hasilResponse");
+        // return hasilResponse;
       });
     } on DioError catch (e) {
       print(e.response!.data);

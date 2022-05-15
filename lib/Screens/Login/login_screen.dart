@@ -7,8 +7,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: const Scaffold(
+    return const LoaderOverlay(
+      child: Scaffold(
         body: Body(),
       ),
     );
