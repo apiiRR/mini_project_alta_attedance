@@ -67,75 +67,6 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
         children: [
-          // SizedBox(
-          //   height: size.height * 0.05,
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Row(
-          //       children: [
-          //         GestureDetector(
-          //           onTap: () {
-          //             Navigator.of(context).push(
-          //                 MaterialPageRoute(builder: (_) => ProfileScreen()));
-          //           },
-          //           child: Container(
-          //             width: 60,
-          //             height: 60,
-          //             decoration: BoxDecoration(
-          //               border: Border.all(
-          //                   width: 4,
-          //                   color: Theme.of(context).scaffoldBackgroundColor),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                     spreadRadius: 2,
-          //                     blurRadius: 10,
-          //                     color: Colors.black.withOpacity(0.1),
-          //                     offset: Offset(0, 1)),
-          //               ],
-          //               shape: BoxShape.circle,
-          //               color: Colors.white,
-          //               image: DecorationImage(
-          //                   fit: BoxFit.fill,
-          //                   image: NetworkImage(profile.data != null &&
-          //                           profile.data!.photo != ""
-          //                       ? profile.data!.photo
-          //                       : "https://firebasestorage.googleapis.com/v0/b/mini-project-flutter-aee89.appspot.com/o/files%2Fuser_profile.png?alt=media&token=5e79293e-e1d6-4e1b-a61a-07a80960e313")),
-          //             ),
-          //           ),
-          //         ),
-          //         SizedBox(width: 15),
-          //         Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             Text(
-          //               "Welcome",
-          //               style: TextStyle(
-          //                   fontWeight: FontWeight.bold,
-          //                   fontSize: 24,
-          //                   fontFamily: 'Poppins'),
-          //             ),
-          //             Text(
-          //               profile.data != null ? profile.data!.name : "Username",
-          //               style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
-          //             )
-          //           ],
-          //         )
-          //       ],
-          //     ),
-          //     Container(
-          //       height: 40,
-          //       width: 40,
-          //       decoration: BoxDecoration(
-          //           shape: BoxShape.circle, color: kPrimaryMaroon),
-          //       child: Icon(
-          //         Icons.notifications,
-          //         color: Colors.white,
-          //       ),
-          //     )
-          //   ],
-          // ),
           SizedBox(
             height: size.height * 0.03,
           ),
@@ -427,12 +358,6 @@ class _HomePageState extends State<HomePage> {
                   fontSize: 18,
                 ),
               ),
-              // TextButton(
-              //     onPressed: () {},
-              //     child: Text(
-              //       "See more",
-              //       style: TextStyle(color: kPrimaryMaroon),
-              //     ))
             ],
           ),
           SizedBox(

@@ -4,6 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/navigation.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:validators/validators.dart';
+import '../../../constants.dart';
 import '../../../view_model/auth_view_model.dart';
 import '/Screens/Singup/singup_screen.dart';
 import '/components/rounded_button.dart';
@@ -15,11 +19,18 @@ import '../../../components/rounded_password_field.dart';
 // import '../../../components/text_field_container.dart';
 import 'background.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
   const Body({
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  bool showEmail = false;
+  bool showPassword = false;
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<AuthViewModel>(context, listen: false);
@@ -30,10 +41,6 @@ class Body extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /* const Text(
-              "LOGIN",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ), */
             SizedBox(
               height: size.height * 0.03,
             ),
@@ -44,7 +51,7 @@ class Body extends StatelessWidget {
             SizedBox(
               height: size.height * 0.03,
             ),
-            Text(
+            const Text(
               "Login",
               style: TextStyle(
                   fontSize: 40,
@@ -58,64 +65,69 @@ class Body extends StatelessWidget {
                 key: _formKey,
                 child: Column(
                   children: [
-                    const RoundedInputField(
+                    RoundedInputField(
                       hintText: "Email",
                       name: 'email',
+                      val: (value) {
+                        if (value != null &&
+                            value.toString().length > 0 &&
+                            isEmail(value)) {
+                          setState(() {
+                            showEmail = false;
+                          });
+                          return null;
+                        } else {
+                          setState(() {
+                            showEmail = true;
+                          });
+                          return "";
+                        }
+                      },
                     ),
-                    const RoundedPasswordField(),
+                    if (showEmail) ...[
+                      const Text(
+                        "* Email tidak valid",
+                        style: TextStyle(color: kPrimaryMaroon),
+                      ),
+                    ],
+                    RoundedPasswordField(
+                      val: (value) {
+                        if (value != null && value.toString().length > 0) {
+                          setState(() {
+                            showPassword = false;
+                          });
+                          return null;
+                        } else {
+                          setState(() {
+                            showPassword = true;
+                          });
+                          return "";
+                        }
+                      },
+                    ),
+                    if (showPassword) ...[
+                      const Text(
+                        "* Password tidak boleh kosong",
+                        style: TextStyle(color: kPrimaryMaroon),
+                      ),
+                    ],
                     RoundedButton(
                         text: "LOGIN",
                         press: () async {
-                          context.loaderOverlay.show();
                           _formKey.currentState!.save();
-                          auth
-                              .signIn(_formKey.currentState!.value["email"],
-                                  _formKey.currentState!.value["password"])
-                              .then((value) {
-                            if (value == true) {
-                              context.loaderOverlay.hide();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  behavior: SnackBarBehavior.floating,
-                                  margin: EdgeInsets.only(bottom: 50.0),
-                                  content: Text("Login Berhasil!!"),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const Navigation()),
-                                (Route) => false,
-                              );
-                            } else {
-                              context.loaderOverlay.hide();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(value["error"]["message"]),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          });
-                          /* .then((value) {
-                              if (value == false) {
+                          if (_formKey.currentState!.validate()) {
+                            context.loaderOverlay.show();
+                            auth
+                                .signIn(_formKey.currentState!.value["email"],
+                                    _formKey.currentState!.value["password"])
+                                .then((value) {
+                              if (value == true) {
                                 context.loaderOverlay.hide();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text("Email & Password anda salah!!"),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              } else {
-                                context.loaderOverlay.hide();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    margin: EdgeInsets.only(bottom: 50.0),
-                                    content: Text("Login Berhasil!!"),
-                                    duration: Duration(seconds: 2),
+                                showTopSnackBar(
+                                  context,
+                                  const CustomSnackBar.success(
+                                    message:
+                                        "Selamat... signup anda berhasil!!",
                                   ),
                                 );
                                 Navigator.pushAndRemoveUntil(
@@ -124,15 +136,18 @@ class Body extends StatelessWidget {
                                       builder: (_) => const Navigation()),
                                   (Route) => false,
                                 );
+                              } else {
+                                print(value);
+                                context.loaderOverlay.hide();
+                                showTopSnackBar(
+                                  context,
+                                  CustomSnackBar.error(
+                                    message: value["error"]["message"],
+                                  ),
+                                );
                               }
-                            }); */
-                          /* Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => navigation(),
-                              ),
-                              (route) => false,
-                            ); */
+                            });
+                          }
                         }),
                   ],
                 )),

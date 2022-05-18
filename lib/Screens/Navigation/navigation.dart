@@ -184,10 +184,6 @@ class _NavigationState extends State<Navigation> {
                       setState(() {
                         _currentIndex = 1;
                       });
-                      // Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (_) => const ReportScreen()));
                     },
                     minWidth: 40,
                     child: Column(

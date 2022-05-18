@@ -36,6 +36,7 @@ class DataViewModel extends ChangeNotifier {
   Future<void> inisialData() async {
     _aWeek = [];
     _allData = [];
+    _aMonth = [];
     currentData = null;
 
     try {
