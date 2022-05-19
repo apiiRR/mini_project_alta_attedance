@@ -52,6 +52,8 @@ class _ReportState extends State<Report> {
           SizedBox(
             height: size.height * 0.02,
           ),
+
+          // section filter bulan
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -112,6 +114,8 @@ class _ReportState extends State<Report> {
           SizedBox(
             height: size.height * 0.02,
           ),
+
+          // section download pdf button
           InkWell(
             onTap: () {
               data.exportPDF(profile.data!);
@@ -168,6 +172,8 @@ class _ReportState extends State<Report> {
               ),
             ],
           ),
+
+          // section riwayat data
           SizedBox(
             height: size.height * 0.02,
           ),

@@ -9,11 +9,9 @@ import 'package:mini_project_alta_attedance/Screens/Navigation/components/time.d
 
 import 'package:mini_project_alta_attedance/view_model/data_view_model.dart';
 import 'package:mini_project_alta_attedance/view_model/profile_view_model.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
-import '../Profile/profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -33,13 +31,19 @@ class _HomePageState extends State<HomePage> {
       final file = File(pickedFile!.path!);
 
       final ref = FirebaseStorage.instance.ref().child(path);
-      uploadTask = ref.putFile(file);
+      setState(() {
+        uploadTask = ref.putFile(file);
+      });
 
       final snapshot = await uploadTask!.whenComplete(() {});
 
       final urlDownload = await snapshot.ref.getDownloadURL();
       print("Download LINK : $urlDownload");
       urlPhoto = urlDownload;
+
+      setState(() {
+        uploadTask = null;
+      });
     }
 
     return urlPhoto;
@@ -70,6 +74,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: size.height * 0.03,
           ),
+
+          // section waktu jam & tanggal
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 10),
@@ -97,6 +103,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: size.height * 0.02,
           ),
+
+          // section pencatat waktu masuk dan keluar terkini
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -177,6 +185,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: size.height * 0.02,
           ),
+
+          // section pengajuan cuti & izin
           Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -295,16 +305,19 @@ class _HomePageState extends State<HomePage> {
                           )),
                       TextButton(
                           onPressed: () async {
-                            var selectedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2022),
-                                lastDate: DateTime(2023),
-                                confirmText: "Cuti",
-                                cancelText: "Batal");
+                            DateTimeRange? selectedDateRange =
+                                await showDateRangePicker(
+                                    context: context,
+                                    initialDateRange: DateTimeRange(
+                                        start: DateTime.now(),
+                                        end: DateTime.now()),
+                                    firstDate: DateTime(2022),
+                                    lastDate: DateTime(2023),
+                                    confirmText: "Cuti",
+                                    cancelText: "Batal");
 
-                            if (selectedDate != null) {
-                              await data.checkInCuti(selectedDate);
+                            if (selectedDateRange != null) {
+                              await data.checkInCuti(selectedDateRange);
                             }
                           },
                           child: Container(
@@ -345,6 +358,12 @@ class _HomePageState extends State<HomePage> {
                   )
                 ],
               )),
+          if (uploadTask != null) ...[
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            buildProgress(),
+          ],
           SizedBox(
             height: size.height * 0.02,
           ),
@@ -360,6 +379,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+
+          // section list data 5 hari terakhir
           SizedBox(
             height: size.height * 0.02,
           ),
@@ -610,4 +631,43 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  Widget buildProgress() => StreamBuilder<TaskSnapshot>(
+        stream: uploadTask?.snapshotEvents,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final data = snapshot.data!;
+            double progress = data.bytesTransferred / data.totalBytes;
+
+            return SizedBox(
+              height: 20,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor: Colors.grey,
+                        color: kPrimaryMaroon,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      '${(100 * progress).roundToDouble()}%',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            );
+          } else {
+            return const SizedBox(
+              height: 50,
+            );
+          }
+        },
+      );
 }

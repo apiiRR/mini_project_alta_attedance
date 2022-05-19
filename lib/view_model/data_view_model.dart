@@ -176,21 +176,42 @@ class DataViewModel extends ChangeNotifier {
   }
 
   Future checkInCuti(date) async {
-    await DataAPI.checkIn(
-            Data(
-                    checkIn: date.toString(),
-                    checkOut: "",
-                    duration: "",
-                    id: "",
-                    userId: userId!,
-                    status: "cuti",
-                    doc: "")
-                .cutiToJson(),
-            token)
-        .then((value) {
+    List<DateTime> days = [];
+
+    List<DateTime> getDaysInBeteween(DateTime startDate, DateTime endDate) {
+      List<DateTime> days = [];
+      for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+        days.add(startDate.add(Duration(days: i)));
+      }
+      return days;
+    }
+
+    DateTimeRange dateRange =
+        DateTimeRange(start: DateTime.now(), end: DateTime.now());
+    dateRange = date;
+
+    days = getDaysInBeteween(dateRange.start, dateRange.end);
+
+    masukDataCuti(days).then((value) {
       inisialData();
       status = true;
     });
+  }
+
+  Future masukDataCuti(item) async {
+    for (var day in item) {
+      await DataAPI.checkIn(
+          Data(
+                  checkIn: day.toString(),
+                  checkOut: "",
+                  duration: "",
+                  id: "",
+                  userId: userId!,
+                  status: "cuti",
+                  doc: "")
+              .cutiToJson(),
+          token);
+    }
   }
 
   Future checkOut() async {
@@ -244,35 +265,52 @@ class DataViewModel extends ChangeNotifier {
                       pw.Text("Job : ${user.job}"),
                       pw.Divider(thickness: 2),
                       pw.Table(border: pw.TableBorder.all(), children: [
-                        pw.TableRow(children: [
-                          pw.Text("Tanggal"),
-                          pw.Text("Check In"),
-                          pw.Text("Check Out"),
-                          pw.Text("Durasi"),
-                          pw.Text("Kehadiran")
-                        ]),
+                        pw.TableRow(
+                          children: [
+                            pw.Center(
+                              child: pw.Text("Tanggal"),
+                            ),
+                            pw.Center(
+                              child: pw.Text("Check In"),
+                            ),
+                            pw.Center(
+                              child: pw.Text("Check Out"),
+                            ),
+                            pw.Center(
+                              child: pw.Text("Durasi"),
+                            ),
+                            pw.Center(child: pw.Text("Kehadiran")),
+                          ],
+                        ),
+                        for (var item in aMonth) ...[
+                          pw.TableRow(children: [
+                            pw.Center(
+                              child: pw.Text(DateFormat('dd MMMM yyyy')
+                                  .format(DateTime.parse(item.checkIn))),
+                            ),
+                            pw.Center(
+                              child: item.status == "hadir"
+                                  ? pw.Text(item.checkIn != ""
+                                      ? DateFormat.Hms()
+                                          .format(DateTime.parse(item.checkIn))
+                                      : "-")
+                                  : pw.Text("-"),
+                            ),
+                            pw.Center(
+                              child: pw.Text(item.checkOut != ""
+                                  ? DateFormat.Hms()
+                                      .format(DateTime.parse(item.checkOut))
+                                  : "-"),
+                            ),
+                            pw.Center(
+                              child: pw.Text(item.duration != ""
+                                  ? "${item.duration} menit"
+                                  : "-"),
+                            ),
+                            pw.Center(child: pw.Text(item.status)),
+                          ])
+                        ],
                       ]),
-                      pw.Table(
-                        border: pw.TableBorder.all(),
-                        children: aMonth
-                            .map((e) => pw.TableRow(children: [
-                                  pw.Text(DateFormat('dd MMMM yyyy')
-                                      .format(DateTime.parse(e.checkIn))),
-                                  pw.Text(e.checkIn != ""
-                                      ? DateFormat.Hms()
-                                          .format(DateTime.parse(e.checkIn))
-                                      : "-"),
-                                  pw.Text(e.checkOut != ""
-                                      ? DateFormat.Hms()
-                                          .format(DateTime.parse(e.checkOut))
-                                      : "-"),
-                                  pw.Text(e.duration != ""
-                                      ? "${e.duration} menit"
-                                      : "-"),
-                                  pw.Text(e.status)
-                                ]))
-                            .toList(),
-                      )
                     ]))
           ];
         }));

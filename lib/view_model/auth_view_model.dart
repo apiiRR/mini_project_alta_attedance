@@ -96,7 +96,10 @@ class AuthViewModel with ChangeNotifier {
       notifyListeners();
       return true;
     } on DioError catch (error) {
-      return error.response!.data;
+      if (error.response != null) {
+        print(error.response?.data);
+        return error.response?.data;
+      }
     }
   }
 

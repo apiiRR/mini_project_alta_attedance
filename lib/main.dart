@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:mini_project_alta_attedance/Screens/Navigation/homepage.dart';
 import 'package:mini_project_alta_attedance/Screens/Navigation/navigation.dart';
 import 'package:mini_project_alta_attedance/view_model/auth_view_model.dart';
 import 'package:mini_project_alta_attedance/view_model/data_view_model.dart';

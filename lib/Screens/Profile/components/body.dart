@@ -32,13 +32,19 @@ class _BodyState extends State<Body> {
       final file = File(pickedFile!.path!);
 
       final ref = FirebaseStorage.instance.ref().child(path);
-      uploadTask = ref.putFile(file);
+      setState(() {
+        uploadTask = ref.putFile(file);
+      });
 
       final snapshot = await uploadTask!.whenComplete(() {});
 
       final urlDownload = await snapshot.ref.getDownloadURL();
       print("Download LINK : $urlDownload");
       urlPhoto = urlDownload;
+
+      setState(() {
+        uploadTask = null;
+      });
     }
 
     return urlPhoto;
@@ -83,6 +89,8 @@ class _BodyState extends State<Body> {
             SizedBox(
               height: size.height * 0.04,
             ),
+
+            // section photo profile
             Center(
               child: Stack(
                 children: [
@@ -190,6 +198,10 @@ class _BodyState extends State<Body> {
                 ],
               ),
             ),
+            if (uploadTask != null) ...[
+              SizedBox(height: size.height * 0.03),
+              buildProgress(),
+            ],
             SizedBox(height: size.height * 0.03),
             Text(
               profile.data != null && profile.data!.name != ""
@@ -217,6 +229,8 @@ class _BodyState extends State<Body> {
                   ),
                 ],
               ),
+
+              // form update profile
               child: FormBuilder(
                 key: _formKey,
                 child: Column(
@@ -372,4 +386,43 @@ class _BodyState extends State<Body> {
       ),
     );
   }
+
+  Widget buildProgress() => StreamBuilder<TaskSnapshot>(
+        stream: uploadTask?.snapshotEvents,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final data = snapshot.data!;
+            double progress = data.bytesTransferred / data.totalBytes;
+
+            return SizedBox(
+              height: 20,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor: Colors.grey,
+                        color: kPrimaryMaroon,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      '${(100 * progress).roundToDouble()}%',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            );
+          } else {
+            return const SizedBox(
+              height: 50,
+            );
+          }
+        },
+      );
 }
